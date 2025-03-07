@@ -6,6 +6,7 @@
     <title>Student Registration</title>
     <link rel="stylesheet" href="registration.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script> <!-- Include face-api.js -->
     <script src="registration.js"></script>
 </head>
 <body>
@@ -34,6 +35,12 @@
                 </select>
                 <input type="text" id="class" placeholder="Class" required>
                 <input type="text" id="academicYear" placeholder="Academic Year" required>
+                <div>
+                    <h3>Capture Face Data</h3>
+                    <video id="video" width="400" height="300" autoplay></video>
+                    <button type="button" id="captureFaceBtn">Capture Face</button>
+                    <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
+                </div>
                 <button type="submit">Register Student</button>
             </form>
         </div>
