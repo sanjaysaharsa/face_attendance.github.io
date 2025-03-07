@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log("Loading face-api.js models...");
             await faceapi.nets.ssdMobilenetv1.loadFromUri('/weights');
             console.log("✅ SSD Mobilenet V1 model loaded successfully!");
-            await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/weights');
+            await faceapi.nets.faceLandmark68TinyNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
             console.log("✅ Face Landmark 68 model loaded successfully!");
             await faceapi.nets.faceRecognitionNet.loadFromUri('/weights');
             console.log("✅ Face Recognition model loaded successfully!");
@@ -152,4 +152,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Run initialization when the page loads
     init();
+    const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
+    .withFaceLandmarks()
+    .withFaceDescriptor();
+
+console.log("Detections:", detections); // Log the detectio
 });
