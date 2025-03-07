@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            text-align: center;
+            position: relative;
+        }
+    
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+    
+        .content {
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+    
+        .qr-code img {
+            width: 120px;
+            height: 120px;
+            margin-right: 20px;
+        }
+    
+        .details p {
+            margin: 10px 0;
+        }
+    
+        /* General Button Styles */
+        .download-btn,
+        .register-btn,
+        .home-btn {
+            position: absolute;
+            top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    
+        .download-btn:hover,
+        .register-btn:hover,
+        .home-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+    
+        .download-btn:active,
+        .register-btn:active,
+        .home-btn:active {
+            transform: translateY(0);
+        }
+    
+        /* Specific Styles for the Register More Students Button */
+        .register-btn {
+            right: 120px; /* Adjusted position */
+            background-color: #28a745; /* Green color for a distinct look */
+        }
+    
+        .register-btn:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+    
+        /* Position Adjustments for Other Buttons */
+        .download-btn {
+            right: 10px;
+        }
+    
+        .home-btn {
+            left: 10px;
+        }
+    
+        /* Responsive Design for Mobile Devices */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 15px;
+            }
+    
+            .download-btn,
+            .register-btn,
+            .home-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+    
+            .register-btn {
+                right: 100px; /* Adjusted position for smaller screens */
+            }
+        }
+    
+        @media (max-width: 480px) {
+            .download-btn,
+            .register-btn,
+            .home-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+    
+            .register-btn {
+                right: 80px; /* Further adjusted position for very small screens */
+            }
+        }
+    
+        /* Hide unnecessary elements when printing */
+        @media print {
+            * {
+                box-sizing: border-box;
+            }
+    
+            body {
+                margin: 0;
+                padding: 0;
+                background-color: white;
+            }
+    
+            .container {
+                width: 100%;
+                max-width: 600px;
+                padding: 20px;
+                margin: auto;
+                text-align: left;
+                page-break-inside: avoid;
+            }
+    
+            h1 {
+                text-align: center;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+    
+            .details p {
+                font-size: 16px;
+                margin: 5px 0;
+            }
+    
+            .qr-code {
+                text-align: left;
+            }
+    
+            .qr-code img {
+                width: 220px;
+                height: 220px;
+            }
+    
+            .download-btn,
+            .register-btn,
+            .home-btn {
+                display: none !important;
+            }
+    
+            @page {
+                margin: 0;
+                size: A4 portrait;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="studentCard">
+        <button class="download-btn" onclick="downloadPage()">Download</button>
+        <button class="register-btn" onclick="goToRegistration()">Register More Students</button>
+        <button class="home-btn" onclick="goToHome()">Home</button>
+        <h1>Student Details</h1>
+        <div class="content">
+            <div class="qr-code" id="qrCode">
+                <!-- QR code will be displayed here -->
+            </div>
+            <div class="details" id="studentDetails">
+                <!-- Student details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchStudentDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const rollNumber = urlParams.get('rollNumber');
+
+            if (!username || !rollNumber) {
+                alert("Invalid URL: Missing username or rollNumber.");
+                return;
+            }
+
+            try {
+                const apiUrl = `https://qr-code-attendance-eqvu.onrender.com/student_details/${username}/${rollNumber}`;
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch student details. Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Backend Response:", data); // Log the backend response
+
+                // Format the date of birth
+                const dateOfBirth = new Date(data.student.date_of_birth);
+                const formattedDateOfBirth = dateOfBirth.toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                // Display student details
+                document.getElementById('studentDetails').innerHTML = `
+                    <p><strong>Name:</strong> ${data.student.name}</p>
+                    <p><strong>Roll Number:</strong> ${data.student.rollNumber}</p>
+                    <p><strong>Class:</strong> ${data.student.class}</p>
+                    <p><strong>Category:</strong> ${data.student.category}</p>
+                    <p><strong>Gender:</strong> ${data.student.gender}</p>
+                    <p><strong>Date of Birth:</strong> ${formattedDateOfBirth}</p>
+                    <p><strong>Academic Year:</strong> ${data.student.academicYear}</p>
+                    <p><strong>Father's Name:</strong> ${data.student.father_name}</p>
+                    <p><strong>Mother's Name:</strong> ${data.student.mother_name}</p>
+                `;
+
+                // Display QR code
+                document.getElementById('qrCode').innerHTML = `<img src="data:image/png;base64,${data.qr_code}" alt="QR Code">`;
+            } catch (error) {
+                console.error("Error fetching student details:", error);
+                alert("Error fetching student details. Check the console for details.");
+            }
+        }
+
+        function downloadPage() {
+            window.print();
+        }
+
+        function goToRegistration() {
+            window.location.href = 'registration.html';
+        }
+
+        function goToHome() {
+            window.location.href = 'a.html'; // Redirect to home page
+        }
+
+        // Fetch student details when the page loads
+        fetchStudentDetails();
+    </script>
+</body>
+
+</html>
