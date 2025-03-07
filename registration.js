@@ -1,121 +1,136 @@
 const serverURL = "https://your-render-app-url.onrender.com";
 
-// Initialize video stream for face capture
-async function initVideoStream() {
-    const video = document.getElementById('video');
-    if (!video) {
-        console.error("Video element not found.");
-        return;
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+    const serverURL = "https://your-render-app-url.onrender.com";
 
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-        video.srcObject = stream;
-        console.log("✅ Camera stream initialized successfully!");
-    } catch (err) {
-        console.error("⚠️ Error accessing camera:", err);
-        alert("Error accessing camera. Please ensure your camera is enabled.");
-    }
-}
-
-// Capture face data
-async function captureFace() {
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-
-    // Draw the current video frame to the canvas
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Detect face and extract face descriptor
-    const detections = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
-    if (!detections) {
-        alert("No face detected. Please try again.");
-        return null;
-    }
-
-    // Convert face descriptor to a format suitable for storage
-    const faceDescriptor = Array.from(detections.descriptor);
-    console.log("✅ Face descriptor captured:", faceDescriptor);
-    return faceDescriptor;
-}
-
-// Register student with face data
-async function registerStudent() {
-    try {
-        const username = localStorage.getItem("username");
-        if (!username) {
-            throw new Error("User not logged in.");
-        }
-
-        // Capture face data
-        const faceDescriptor = await captureFace();
-        if (!faceDescriptor) {
+    // Initialize video stream for face capture
+    async function initVideoStream() {
+        const video = document.getElementById('video');
+        if (!video) {
+            console.error("Video element not found.");
             return;
         }
-
-        // Collect form data
-        const name = document.getElementById('name').value;
-        const rollNumber = document.getElementById('rollNumber').value;
-        const father_name = document.getElementById('father_name').value;
-        const mother_name = document.getElementById('mother_name').value;
-        const date_of_birth = document.getElementById('date_of_birth').value;
-        const category = document.getElementById('category').value;
-        const gender = document.getElementById('gender').value;
-        const classValue = document.getElementById('class').value;
-        const academicYear = document.getElementById('academicYear').value;
-
-        const studentData = {
-            username,
-            rollNumber,
-            name,
-            father_name,
-            mother_name,
-            date_of_birth,
-            category,
-            gender,
-            class: classValue,
-            academicYear,
-            faceDescriptor // Include face descriptor in the payload
-        };
-
-        console.log("Sending payload:", studentData);
-
-        // Send data to the server
-        const response = await fetch(`${serverURL}/register_student`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(studentData)
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message);
-            window.location.href = `student_details.html?username=${username}&rollNumber=${rollNumber}`;
-        } else {
-            alert(result.error || "Failed to register student.");
+    
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+            video.srcObject = stream;
+            console.log("✅ Camera stream initialized successfully!");
+        } catch (err) {
+            console.error("⚠️ Error accessing camera:", err);
+            if (err.name === "NotAllowedError") {
+                alert("Camera access denied. Please allow camera access in your browser settings.");
+            } else if (err.name === "NotFoundError") {
+                alert("No camera found. Please ensure your camera is connected.");
+            } else {
+                alert("Error accessing camera. Please try again.");
+            }
         }
-    } catch (error) {
-        console.error("Error registering student:", error);
-        alert("Error connecting to server.");
     }
-}
 
-// Initialize the page
-async function init() {
-    await initVideoStream();
+    // Capture face data
+    async function captureFace() {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
 
-    // Add event listener for the "Capture Face" button
-    document.getElementById('captureFaceBtn').addEventListener('click', async () => {
-        const faceDescriptor = await captureFace();
-        if (faceDescriptor) {
-            alert("Face captured successfully!");
+        // Draw the current video frame to the canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Detect face and extract face descriptor
+        const detections = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+
+        if (!detections) {
+            alert("No face detected. Please try again.");
+            return null;
         }
-    });
-}
 
-// Run initialization when the page loads
-init();
+        // Convert face descriptor to a format suitable for storage
+        const faceDescriptor = Array.from(detections.descriptor);
+        console.log("✅ Face descriptor captured:", faceDescriptor);
+        return faceDescriptor;
+    }
+
+    // Register student with face data
+    async function registerStudent() {
+        try {
+            const username = localStorage.getItem("username");
+            if (!username) {
+                throw new Error("User not logged in.");
+            }
+
+            // Capture face data
+            const faceDescriptor = await captureFace();
+            if (!faceDescriptor) {
+                return;
+            }
+
+            // Collect form data
+            const name = document.getElementById('name').value;
+            const rollNumber = document.getElementById('rollNumber').value;
+            const father_name = document.getElementById('father_name').value;
+            const mother_name = document.getElementById('mother_name').value;
+            const date_of_birth = document.getElementById('date_of_birth').value;
+            const category = document.getElementById('category').value;
+            const gender = document.getElementById('gender').value;
+            const classValue = document.getElementById('class').value;
+            const academicYear = document.getElementById('academicYear').value;
+
+            const studentData = {
+                username,
+                rollNumber,
+                name,
+                father_name,
+                mother_name,
+                date_of_birth,
+                category,
+                gender,
+                class: classValue,
+                academicYear,
+                faceDescriptor // Include face descriptor in the payload
+            };
+
+            console.log("Sending payload:", studentData);
+
+            // Send data to the server
+            const response = await fetch(`${serverURL}/register_student`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(studentData)
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                window.location.href = `student_details.html?username=${username}&rollNumber=${rollNumber}`;
+            } else {
+                alert(result.error || "Failed to register student.");
+            }
+        } catch (error) {
+            console.error("Error registering student:", error);
+            alert("Error connecting to server.");
+        }
+    }
+
+    // Initialize the page
+    async function init() {
+        await initVideoStream();
+
+        // Add event listener for the "Capture Face" button
+        const captureFaceBtn = document.getElementById('captureFaceBtn');
+        if (captureFaceBtn) {
+            captureFaceBtn.addEventListener('click', async () => {
+                const faceDescriptor = await captureFace();
+                if (faceDescriptor) {
+                    alert("Face captured successfully!");
+                }
+            });
+        } else {
+            console.error("Capture Face button not found.");
+        }
+    }
+
+    // Run initialization when the page loads
+    init();
+});
