@@ -1,13 +1,11 @@
-const serverURL = "https://your-render-app-url.onrender.com";
-
 document.addEventListener("DOMContentLoaded", async () => {
-    const serverURL = "https://your-render-app-url.onrender.com";
+    const serverURL = "https://face-attendance-github-io.onrender.com";
 
-    // Load face-api.js models from CDN
+    // Load face-api.js models from the 'weights' folder
     async function loadModels() {
         try {
             console.log("Loading face-api.js models...");
-            await faceapi.nets.tinyFaceDetector.loadFromUri('/weights');
+            await faceapi.nets.ssdMobilenetv1.loadFromUri('/weights');
             await faceapi.nets.faceLandmark68Net.loadFromUri('/weights');
             await faceapi.nets.faceRecognitionNet.loadFromUri('/weights');
             console.log("✅ Face models loaded successfully!");
@@ -16,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Error loading face models. Please check the console for details.");
         }
     }
+
     // Initialize video stream for face capture
     async function initVideoStream() {
         const video = document.getElementById('video');
@@ -43,8 +42,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         // Draw the current video frame to the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Detect face and extract face descriptor
-        const detections = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions())
+        // Detect face and extract face descriptor using SSD Mobilenet V1
+        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();
 
@@ -136,6 +135,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         } else {
             console.error("Capture Face button not found.");
+        }
+
+        // Add event listener for the registration form
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                await registerStudent();
+            });
+        } else {
+            console.error("Registration form not found.");
         }
     }
 

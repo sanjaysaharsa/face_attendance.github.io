@@ -15,7 +15,7 @@
         <h1>Student Registration</h1>
         <div class="form-section">
             <h2>Register Student</h2>
-            <form id="registerForm" onsubmit="event.preventDefault(); registerStudent();">
+            <form id="registerForm">
                 <input type="text" id="name" placeholder="Student Name" required>
                 <input type="text" id="rollNumber" placeholder="Roll Number" required>
                 <input type="text" id="father_name" placeholder="Father's Name" required>
@@ -42,7 +42,6 @@
                     <button type="button" id="captureFaceBtn">Capture Face</button>
                     <canvas id="canvas" width="400" height="300" style="display:none;"></canvas>
                 </div>
-                <button type="submit">Register Student</button>
             </form>
         </div>
     </div>

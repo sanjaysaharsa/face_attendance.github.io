@@ -128,6 +128,7 @@ init_db()  # Run database setup
 
 # Serve static files (frontend)
 # Serve static files (frontend)
+# Serve static files (frontend)
 @app.route('/')
 def serve_index():
     return send_from_directory('static', 'index.html')
