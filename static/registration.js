@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const serverURL = "https://face-attendance-github-io.onrender.com";
+    const serverURL = "https://your-render-app-url.onrender.com";
 
     // Load face-api.js models from the 'weights' folder
     async function loadModels() {
