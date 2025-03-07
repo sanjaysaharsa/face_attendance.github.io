@@ -139,6 +139,10 @@ def serve_attendance_summary():
 def serve_static(path):
     return send_from_directory('.', path)
 
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
+
 @app.route('/weights/<path:filename>')
 def serve_weights(filename):
     return send_from_directory('weights', filename)
