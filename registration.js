@@ -1,25 +1,5 @@
 const serverURL = "https://your-render-app-url.onrender.com";
 
-// Load face-api.js models
-async function loadModels() {
-    try {
-        if (!faceapi) {
-            throw new Error("faceapi is not defined. Ensure the script is loaded correctly.");
-        }
-
-        console.log("Loading tinyFaceDetector model...");
-        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-        console.log("Loading faceLandmark68Net model...");
-        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-        console.log("Loading faceRecognitionNet model...");
-        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-        console.log("✅ Face models loaded successfully!");
-    } catch (error) {
-        console.error("⚠️ Error loading face models:", error);
-        alert("Error loading face models. Please check the console for details.");
-    }
-}
-
 // Initialize video stream for face capture
 async function initVideoStream() {
     const video = document.getElementById('video');
@@ -126,7 +106,6 @@ async function registerStudent() {
 
 // Initialize the page
 async function init() {
-    await loadModels();
     await initVideoStream();
 
     // Add event listener for the "Capture Face" button
