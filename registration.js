@@ -3,6 +3,20 @@ const serverURL = "https://your-render-app-url.onrender.com";
 document.addEventListener("DOMContentLoaded", async () => {
     const serverURL = "https://your-render-app-url.onrender.com";
 
+    // Load face-api.js models from CDN
+    async function loadModels() {
+        try {
+            console.log("Loading face-api.js models...");
+            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
+            await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
+            console.log("✅ Face models loaded successfully!");
+        } catch (error) {
+            console.error("⚠️ Error loading face models:", error);
+            alert("Error loading face models. Please check the console for details.");
+        }
+    }
+
     // Initialize video stream for face capture
     async function initVideoStream() {
         const video = document.getElementById('video');
@@ -10,20 +24,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Video element not found.");
             return;
         }
-    
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
             video.srcObject = stream;
             console.log("✅ Camera stream initialized successfully!");
         } catch (err) {
             console.error("⚠️ Error accessing camera:", err);
-            if (err.name === "NotAllowedError") {
-                alert("Camera access denied. Please allow camera access in your browser settings.");
-            } else if (err.name === "NotFoundError") {
-                alert("No camera found. Please ensure your camera is connected.");
-            } else {
-                alert("Error accessing camera. Please try again.");
-            }
+            alert("Error accessing camera. Please ensure your camera is enabled.");
         }
     }
 
@@ -115,6 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Initialize the page
     async function init() {
+        await loadModels(); // Load models first
         await initVideoStream();
 
         // Add event listener for the "Capture Face" button
