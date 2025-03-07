@@ -139,6 +139,10 @@ def serve_attendance_summary():
 def serve_static(path):
     return send_from_directory('.', path)
 
+@app.route('/weights/<path:filename>')
+def serve_weights(filename):
+    return send_from_directory('weights', filename)
+
 # Register Student API
 # Register Student API
 @app.route('/register_student', methods=['POST', 'OPTIONS'])

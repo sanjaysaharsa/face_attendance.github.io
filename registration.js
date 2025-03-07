@@ -7,16 +7,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadModels() {
         try {
             console.log("Loading face-api.js models...");
-            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
+            await faceapi.nets.tinyFaceDetector.loadFromUri('/weights');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('/weights');
+            await faceapi.nets.faceRecognitionNet.loadFromUri('/weights');
             console.log("✅ Face models loaded successfully!");
         } catch (error) {
             console.error("⚠️ Error loading face models:", error);
             alert("Error loading face models. Please check the console for details.");
         }
     }
-
     // Initialize video stream for face capture
     async function initVideoStream() {
         const video = document.getElementById('video');
