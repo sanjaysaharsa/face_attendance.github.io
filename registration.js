@@ -2,9 +2,15 @@ const serverURL = "https://your-render-app-url.onrender.com";
 
 // Load face-api.js models
 async function loadModels() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+        console.log("✅ Face models loaded successfully!");
+    } catch (error) {
+        console.error("⚠️ Error loading face models:", error);
+        alert("Error loading face models. Please check the console for details.");
+    }
 }
 
 // Initialize video stream for face capture
@@ -13,8 +19,9 @@ async function initVideoStream() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
         video.srcObject = stream;
+        console.log("✅ Camera stream initialized successfully!");
     } catch (err) {
-        console.error("Error accessing camera:", err);
+        console.error("⚠️ Error accessing camera:", err);
         alert("Error accessing camera. Please ensure your camera is enabled.");
     }
 }
@@ -40,6 +47,7 @@ async function captureFace() {
 
     // Convert face descriptor to a format suitable for storage
     const faceDescriptor = Array.from(detections.descriptor);
+    console.log("✅ Face descriptor captured:", faceDescriptor);
     return faceDescriptor;
 }
 
@@ -110,7 +118,12 @@ async function init() {
     await initVideoStream();
 
     // Add event listener for the "Capture Face" button
-    document.getElementById('captureFaceBtn').addEventListener('click', captureFace);
+    document.getElementById('captureFaceBtn').addEventListener('click', async () => {
+        const faceDescriptor = await captureFace();
+        if (faceDescriptor) {
+            alert("Face captured successfully!");
+        }
+    });
 }
 
 // Run initialization when the page loads
