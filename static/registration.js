@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-
     const serverURL = "https://face-attendance-github-io.onrender.com";
 
     // Load face-api.js models from the 'weights' folder
@@ -17,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("Error loading face models. Please check the console for details.");
         }
     }
+
     // Initialize video stream for face capture
     async function initVideoStream() {
         const video = document.getElementById('video');
@@ -26,7 +26,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+            // Lower video resolution to reduce computational load
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
             video.srcObject = stream;
             console.log("✅ Camera stream initialized successfully!");
         } catch (err) {
@@ -41,32 +42,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
-    
+
         if (!video || !canvas) {
             console.error("Video or Canvas element not found.");
             return null;
         }
-    
+
         // Draw the current video frame to the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         console.log("Video frame drawn to canvas."); // Log canvas draw
-    
-        // Log the canvas image data for debugging
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        console.log("Canvas image data:", imageData);
-    
+
         // Detect face and extract face descriptor using SSD Mobilenet V1
-        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
+        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
             .withFaceLandmarks()
             .withFaceDescriptor();
-    
+
         console.log("Detections:", detections); // Log detections
-    
+
         if (!detections) {
             alert("No face detected. Please try again.");
             return null;
         }
-    
+
         // Check for valid bounding box dimensions
         if (detections.detection && detections.detection.box) {
             const box = detections.detection.box;
@@ -82,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("No face detected. Please try again.");
             return null;
         }
-    
+
         // Convert face descriptor to a format suitable for storage
         const faceDescriptor = Array.from(detections.descriptor);
         console.log("✅ Face descriptor captured:", faceDescriptor);
@@ -127,9 +124,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 academicYear,
                 faceDescriptor // Include face descriptor in the payload
             };
-            
+
             console.log("Sending payload:", studentData);
-            
+
             // Send data to the server
             const response = await fetch(`${serverURL}/register_student`, {
                 method: "POST",
@@ -182,9 +179,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Run initialization when the page loads
     init();
-    const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
-        .withFaceLandmarks()
-        .withFaceDescriptor();
-
-    console.log("Detections:", detections); // Log the detectio
 });
