@@ -45,24 +45,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // Detect face and extract face descriptor using SSD Mobilenet V1
-        const img = await faceapi.fetchImage('path/to/test-image.jpg');
+        const img = await faceapi.fetchImage('https://face-attendance-github-io.onrender.com/static/20171015_073605.jpg');
         const detections = await faceapi.detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();
 
         console.log("Detections:", detections);
 
-        if (detections && detections.detection && detections.detection.box) {
+        console.log("Detections:", detections);
+
+        if (!detections) {
+            alert("No face detected. Please try again.");
+            return null;
+        }
+
+        // Check for valid bounding box dimensions
+        if (detections.detection && detections.detection.box) {
             const box = detections.detection.box;
             if (box.width > 0 && box.height > 0) {
-                // Proceed with face descriptor extraction
+                console.log("✅ Valid bounding box detected:", box);
             } else {
-                console.error("Invalid bounding box dimensions:", box);
+                console.error("⚠️ Invalid bounding box dimensions:", box);
                 alert("No face detected. Please try again.");
                 return null;
             }
         } else {
-            console.error("No face detected.");
+            console.error("⚠️ No bounding box found in detections.");
             alert("No face detected. Please try again.");
             return null;
         }
