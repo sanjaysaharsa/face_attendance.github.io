@@ -41,32 +41,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
-
+    
         if (!video || !canvas) {
             console.error("Video or Canvas element not found.");
             return null;
         }
-
+    
         // Draw the current video frame to the canvas
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         console.log("Video frame drawn to canvas."); // Log canvas draw
-
+    
         // Log the canvas image data for debugging
         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
         console.log("Canvas image data:", imageData);
-
+    
         // Detect face and extract face descriptor using SSD Mobilenet V1
-        const img = await faceapi.fetchImage('https://face-attendance-github-io.onrender.com/static/20171015_073605.jpg');
-        const detections = await faceapi.detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
+        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();
-
-        console.log("Detections:", detections);
+    
+        console.log("Detections:", detections); // Log detections
+    
         if (!detections) {
             alert("No face detected. Please try again.");
             return null;
         }
-
+    
         // Check for valid bounding box dimensions
         if (detections.detection && detections.detection.box) {
             const box = detections.detection.box;
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("No face detected. Please try again.");
             return null;
         }
-
+    
         // Convert face descriptor to a format suitable for storage
         const faceDescriptor = Array.from(detections.descriptor);
         console.log("✅ Face descriptor captured:", faceDescriptor);
@@ -127,9 +127,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 academicYear,
                 faceDescriptor // Include face descriptor in the payload
             };
-
+            
             console.log("Sending payload:", studentData);
-
+            
             // Send data to the server
             const response = await fetch(`${serverURL}/register_student`, {
                 method: "POST",

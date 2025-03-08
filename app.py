@@ -150,63 +150,45 @@ def serve_weights(filename):
 
 # Register Student API
 # Register Student API
-@app.route('/register_student', methods=['POST', 'OPTIONS'])
+@app.route('/register_student', methods=['POST'])
 def register_student():
-    if request.method == 'OPTIONS':
-        response = jsonify({})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-        response.headers.add("Access-Control-Allow-Methods", "POST")
-        return response, 200
-
     data = request.json
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    required_fields = [
-        "username", "rollNumber", "name", "father_name", "mother_name", "date_of_birth",
-        "class", "category", "gender", "academicYear", "faceDescriptor"
-    ]
-    if not all(key in data for key in required_fields):
-        return jsonify({"error": "Missing required fields"}), 400
-
+    # Extract data from the request
     username = data.get("username")
     rollNumber = data.get("rollNumber")
     name = data.get("name")
     father_name = data.get("father_name")
     mother_name = data.get("mother_name")
     date_of_birth = data.get("date_of_birth")
-    classValue = data.get("class")
     category = data.get("category")
     gender = data.get("gender")
+    classValue = data.get("class")
     academicYear = data.get("academicYear")
-    faceDescriptor = json.dumps(data.get("faceDescriptor"))  # Convert to JSON string
+    faceDescriptor = data.get("faceDescriptor")  # Extract face descriptor
 
     try:
-        if not create_user_student_table(username):
-            return jsonify({"error": "Database connection error"}), 500
-
+        # Connect to the database
         conn = get_db_connection_reg()
         if not conn:
             return jsonify({"error": "Database connection error"}), 500
 
         cursor = conn.cursor()
         table_name = f"students_{username}"
+
+        # Insert the student data into the database
         cursor.execute(
             f"INSERT INTO {table_name} (rollNumber, name, father_name, mother_name, date_of_birth, class, category, gender, academicYear, faceDescriptor) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (rollNumber, name, father_name, mother_name, date_of_birth, classValue, category, gender, academicYear, faceDescriptor)
+            (rollNumber, name, father_name, mother_name, date_of_birth, classValue, category, gender, academicYear, json.dumps(faceDescriptor))  # Store face descriptor as JSON
         )
         conn.commit()
         conn.close()
 
-        print(f"✅ Student registered: {rollNumber}, {name}, {father_name}, {mother_name}, {date_of_birth}, {classValue}, {category}, {gender}, {academicYear}")
-
         return jsonify({"message": "Student registration successful"})
 
-    except mysql.connector.IntegrityError as e:
-        print("⚠️ Integrity Error:", str(e))
-        return jsonify({"error": "Student already registered"}), 400
     except mysql.connector.Error as e:
         print("⚠️ MySQL Error:", str(e))
         return jsonify({"error": "Database error"}), 500
