@@ -44,11 +44,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // Detect face and extract face descriptor using SSD Mobilenet V1
-        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
+        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-        if (!detections) {
+        console.log("Detections:", detections); // Log the detections
+
+        if (detections && detections.detection && detections.detection.box) {
+            const box = detections.detection.box;
+            if (box.width > 0 && box.height > 0) {
+                // Proceed with face descriptor extraction
+            } else {
+                console.error("Invalid bounding box dimensions:", box);
+                alert("No face detected. Please try again.");
+                return null;
+            }
+        } else {
+            console.error("No face detected.");
             alert("No face detected. Please try again.");
             return null;
         }
@@ -153,8 +165,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Run initialization when the page loads
     init();
     const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options())
-    .withFaceLandmarks()
-    .withFaceDescriptor();
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-console.log("Detections:", detections); // Log the detectio
+    console.log("Detections:", detections); // Log the detectio
 });
