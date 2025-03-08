@@ -5,11 +5,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadModels() {
         try {
             console.log("Loading face-api.js models...");
-            await faceapi.nets.ssdMobilenetv1.loadFromUri('./weights');
+            await faceapi.nets.ssdMobilenetv1.loadFromUri('/weights');
             console.log("✅ SSD Mobilenet V1 model loaded successfully!");
-            await faceapi.nets.faceLandmark68TinyNet.loadFromUri('./weights');
+            await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/weights');
             console.log("✅ Face Landmark 68 model loaded successfully!");
-            await faceapi.nets.faceRecognitionNet.loadFromUri('./weights');
+            await faceapi.nets.faceRecognitionNet.loadFromUri('/weights');
             console.log("✅ Face Recognition model loaded successfully!");
         } catch (error) {
             console.error("⚠️ Error loading face models:", error);
