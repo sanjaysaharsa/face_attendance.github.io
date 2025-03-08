@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+
     const serverURL = "https://face-attendance-github-io.onrender.com";
 
     // Load face-api.js models from the 'weights' folder
@@ -7,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.log("Loading face-api.js models...");
             await faceapi.nets.ssdMobilenetv1.loadFromUri('/weights');
             console.log("✅ SSD Mobilenet V1 model loaded successfully!");
-            await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/weights');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('/weights');
             console.log("✅ Face Landmark 68 model loaded successfully!");
             await faceapi.nets.faceRecognitionNet.loadFromUri('/weights');
             console.log("✅ Face Recognition model loaded successfully!");
@@ -44,11 +45,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // Detect face and extract face descriptor using SSD Mobilenet V1
-        const detections = await faceapi.detectSingleFace(canvas, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+        const img = await faceapi.fetchImage('path/to/test-image.jpg');
+        const detections = await faceapi.detectSingleFace(img, new faceapi.SsdMobilenetv1Options())
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-        console.log("Detections:", detections); // Log the detections
+        console.log("Detections:", detections);
 
         if (detections && detections.detection && detections.detection.box) {
             const box = detections.detection.box;
